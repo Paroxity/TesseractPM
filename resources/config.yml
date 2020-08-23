@@ -1,0 +1,8 @@
+proxy:
+  address: "127.0.0.1"
+  port: 19132
+socket:
+  port: 19131
+  secret: ""
+server:
+  name: "TesseractServer"

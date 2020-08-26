@@ -17,7 +17,6 @@ use function socket_read;
 use function socket_set_nonblock;
 use function socket_write;
 use function strlen;
-use function var_dump;
 use const AF_INET;
 use const IPPROTO_IP;
 use const SOCK_STREAM;
@@ -46,7 +45,6 @@ class SocketThread extends Thread
 
     public function __construct(string $host, int $port, string $secret, string $name, string $address, SleeperNotifier $notifier)
     {
-        var_dump($host);
         $this->host = $host;
         $this->port = $port;
 
@@ -102,15 +100,12 @@ class SocketThread extends Thread
         }
 
         do {
-            var_dump("Attempting connection");
             $connected = @socket_connect($socket, $this->host, $this->port);
             if (!$connected) {
-                var_dump("Failed");
                 sleep(10);
             }
         } while (!$connected);
 
-        var_dump("Success");
         $pk = new ProxyAuthRequestPacket();
         $pk->secret = $this->secret;
         $pk->name = $this->name;

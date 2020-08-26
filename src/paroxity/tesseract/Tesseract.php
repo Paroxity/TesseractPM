@@ -8,12 +8,11 @@ use paroxity\tesseract\packet\ProxyBlockedChatPacket;
 use paroxity\tesseract\packet\ProxyPacket;
 use paroxity\tesseract\thread\SocketThread;
 use pocketmine\network\mcpe\protocol\PacketPool;
-use pocketmine\Player;
+use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
-use pocketmine\utils\UUID;
-use function var_dump;
+use pocketmine\uuid\UUID;
 
 class Tesseract extends PluginBase
 {
@@ -40,19 +39,19 @@ class Tesseract extends PluginBase
         $server = $config->get("server", []);
 
         $this->proxyAddress = $proxyAddress = $proxy["address"] ?? "127.0.0.1";
-        var_dump($proxyAddress);
         $this->proxyPort = $proxyAddress = $proxy["port"] ?? 19132;
 
-        PacketPool::registerPacket(new ProxyAuthRequestPacket());
-        PacketPool::registerPacket(new ProxyAuthResponsePacket());
-        PacketPool::registerPacket(new ProxyBlockedChatPacket());
+        $pool = PacketPool::getInstance();
+        $pool->registerPacket(new ProxyAuthRequestPacket());
+        $pool->registerPacket(new ProxyAuthResponsePacket());
+        $pool->registerPacket(new ProxyBlockedChatPacket());
 
         $notifier = new SleeperNotifier();
         $localAddress = ($socket["host"] ?? "127.0.0.1") === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
-        $this->thread = $thread = new SocketThread("127.0.0.1", (int)($socket["port"] ?? 19131), $socket["secret"] ?? "", $server["name"] ?? "TesseractServer", ($localAddress ? $localAddress : "127.0.0.1") . ":" . $this->getServer()->getPort(), $notifier);
-        $this->getServer()->getTickSleeper()->addNotifier($notifier, static function () use ($thread) {
+        $this->thread = $thread = new SocketThread($proxyAddress, (int)($socket["port"] ?? 19131), $socket["secret"] ?? "", $server["name"] ?? "TesseractServer", ($localAddress ? $localAddress : "127.0.0.1") . ":" . $this->getServer()->getPort(), $notifier);
+        $this->getServer()->getTickSleeper()->addNotifier($notifier, static function () use ($pool, $thread) {
             while (($buffer = $thread->getBuffer()) !== null) {
-                $packet = PacketPool::getPacket($buffer);
+                $packet = $pool->getPacket($buffer);
                 if ($packet instanceof ProxyPacket) {
                     $packet->decode();
                     $packet->proxyHandle();

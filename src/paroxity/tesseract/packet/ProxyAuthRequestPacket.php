@@ -2,6 +2,8 @@
 
 namespace paroxity\tesseract\packet;
 
+use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+
 class ProxyAuthRequestPacket extends ProxyPacket
 {
     public const NETWORK_ID = ProtocolInfo::PROXY_AUTH_REQUEST_PACKET;
@@ -10,28 +12,58 @@ class ProxyAuthRequestPacket extends ProxyPacket
     public const CONN_TYPE_OTHER = 1;
 
     /** @var string */
-    public $secret;
+    private $secret;
     /** @var string */
-    public $name;
+    private $name;
     /** @var int */
-    public $type;
+    private $type;
     /** @var string */
-    public $address;
+    private $address;
 
-    protected function decodePayload(): void
+    public static function create(string $secret, string $name, int $type, string $address): self
     {
-        $this->secret = $this->getString();
-        $this->name = $this->getString();
-        $this->type = $this->getByte();
-        $this->address = $this->getString();
+        $result = new self;
+        $result->secret = $secret;
+        $result->name = $name;
+        $result->type = $type;
+        $result->address = $address;
+        return $result;
     }
 
-    protected function encodePayload(): void
+    public function getSecret(): string
     {
-        $this->putString($this->secret);
-        $this->putString($this->name);
-        $this->putByte($this->type);
-        $this->putString($this->address);
+        return $this->secret;
+    }
+
+    public function getServerName(): string
+    {
+        return $this->name;
+    }
+
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function getAddress(): string
+    {
+        return $this->address;
+    }
+
+    protected function decodePayload(PacketSerializer $in): void
+    {
+        $this->secret = $in->getString();
+        $this->name = $in->getString();
+        $this->type = $in->getByte();
+        $this->address = $in->getString();
+    }
+
+    protected function encodePayload(PacketSerializer $out): void
+    {
+        $out->putString($this->secret);
+        $out->putString($this->name);
+        $out->putByte($this->type);
+        $out->putString($this->address);
     }
 
     public function proxyHandle(): void

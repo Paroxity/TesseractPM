@@ -6,7 +6,7 @@ use Exception;
 use paroxity\tesseract\packet\ProxyAuthRequestPacket;
 use paroxity\tesseract\packet\ProxyPacket;
 use pocketmine\snooze\SleeperNotifier;
-use pocketmine\Thread;
+use pocketmine\thread\Thread;
 use pocketmine\utils\Binary;
 use Threaded;
 use function sleep;
@@ -17,9 +17,9 @@ use function socket_read;
 use function socket_set_nonblock;
 use function socket_write;
 use function strlen;
-use function var_dump;
 use const AF_INET;
 use const IPPROTO_IP;
+use const PTHREADS_INHERIT_NONE;
 use const SOCK_STREAM;
 
 class SocketThread extends Thread
@@ -46,7 +46,6 @@ class SocketThread extends Thread
 
     public function __construct(string $host, int $port, string $secret, string $name, string $address, SleeperNotifier $notifier)
     {
-        var_dump($host);
         $this->host = $host;
         $this->port = $port;
 
@@ -63,7 +62,7 @@ class SocketThread extends Thread
         $this->start();
     }
 
-    public function run(): void
+    public function onRun(): void
     {
         $socket = $this->connectToSocketServer();
         socket_set_nonblock($socket);
@@ -102,32 +101,25 @@ class SocketThread extends Thread
         }
 
         do {
-            var_dump("Attempting connection");
             $connected = @socket_connect($socket, $this->host, $this->port);
             if (!$connected) {
-                var_dump("Failed");
                 sleep(10);
             }
         } while (!$connected);
 
-        var_dump("Success");
-        $pk = new ProxyAuthRequestPacket();
-        $pk->secret = $this->secret;
-        $pk->name = $this->name;
-        $pk->type = ProxyAuthRequestPacket::CONN_TYPE_SERVER;
-        $pk->address = $this->address;
+        $pk = ProxyAuthRequestPacket::create($this->secret, $this->name, ProxyAuthRequestPacket::CONN_TYPE_SERVER, $this->address);
         $this->addPacketToQueue($pk);
 
         return $socket;
     }
 
-    public function start(int $options = PTHREADS_INHERIT_ALL): void
+    public function start(int $options = PTHREADS_INHERIT_NONE): bool
     {
         $this->isRunning = true;
-        parent::start($options);
+        return parent::start($options);
     }
 
-    public function quit()
+    public function quit(): void
     {
         $this->isRunning = false;
         parent::quit();
@@ -136,7 +128,7 @@ class SocketThread extends Thread
     public function addPacketToQueue(ProxyPacket $packet): void
     {
         $packet->encode();
-        $this->sendQueue[] = $packet->getBuffer();
+        $this->sendQueue[] = $packet->getSerializer()->getBuffer();
     }
 
     /**

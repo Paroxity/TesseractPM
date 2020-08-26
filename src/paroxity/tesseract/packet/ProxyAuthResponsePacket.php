@@ -4,6 +4,7 @@ namespace paroxity\tesseract\packet;
 
 use paroxity\tesseract\exception\TesseractAuthException;
 use paroxity\tesseract\Tesseract;
+use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 
 class ProxyAuthResponsePacket extends ProxyPacket
 {
@@ -13,20 +14,37 @@ class ProxyAuthResponsePacket extends ProxyPacket
     public const RESPONSE_FAIL = 1;
 
     /** @var int */
-    public $response;
+    private $response;
     /** @var string */
-    public $reason;
+    private $reason;
 
-    protected function decodePayload(): void
+    public static function create(int $response, string $reason): self
     {
-        $this->response = $this->getByte();
-        $this->reason = $this->getString();
+        $result = new self;
+        $result->response = $response;
+        return $result;
     }
 
-    protected function encodePayload(): void
+    public function getResponse(): int
     {
-        $this->putByte($this->response);
-        $this->putString($this->reason);
+        return $this->response;
+    }
+
+    public function getReason(): string
+    {
+        return $this->reason;
+    }
+
+    protected function decodePayload(PacketSerializer $in): void
+    {
+        $this->response = $in->getByte();
+        $this->reason = $in->getString();
+    }
+
+    protected function encodePayload(PacketSerializer $out): void
+    {
+        $out->putByte($this->response);
+        $out->putString($this->reason);
     }
 
     public function proxyHandle(): void

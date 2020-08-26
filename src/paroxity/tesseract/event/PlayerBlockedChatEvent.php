@@ -3,11 +3,14 @@
 namespace paroxity\tesseract\event;
 
 use pocketmine\event\Cancellable;
+use pocketmine\event\CancellableTrait;
 use pocketmine\event\player\PlayerEvent;
-use pocketmine\Player;
+use pocketmine\player\Player;
 
 class PlayerBlockedChatEvent extends PlayerEvent implements Cancellable
 {
+    use CancellableTrait;
+
     /** @var string */
     private $message;
 

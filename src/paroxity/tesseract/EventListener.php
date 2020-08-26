@@ -3,7 +3,7 @@
 namespace paroxity\tesseract;
 
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerPreLoginEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 
 class EventListener implements Listener
 {
@@ -15,10 +15,14 @@ class EventListener implements Listener
         $this->plugin = $plugin;
     }
 
-    public function onPlayerPreLogin(PlayerPreLoginEvent $event): void
+    public function onPlayerPreLogin(PlayerLoginEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($player->getAddress() !== $this->plugin->getProxyAddress()) {
+        $session = $player->getNetworkSession();
+
+        $ip = $this->plugin->getProxyAddress();
+        $port = $this->plugin->getProxyPort();
+        if ($session->getIp() !== $ip) {
             $player->transfer($this->plugin->getProxyAddress(), $this->plugin->getProxyPort());
             $event->setCancelled();
         }

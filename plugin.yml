@@ -1,6 +1,6 @@
 name: Tesseract
 main: paroxity\tesseract\Tesseract
-api: 3.0.0
+api: 4.0.0
 author: ParoxityTeam
 description: "PocketMine-MP server implementation of Tesseract"
 version: 1.0.0

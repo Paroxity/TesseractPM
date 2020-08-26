@@ -4,7 +4,8 @@ namespace paroxity\tesseract\packet;
 
 use paroxity\tesseract\event\PlayerBlockedChatEvent;
 use paroxity\tesseract\Tesseract;
-use pocketmine\utils\UUID;
+use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pocketmine\uuid\UUID;
 
 class ProxyBlockedChatPacket extends ProxyPacket
 {
@@ -15,16 +16,34 @@ class ProxyBlockedChatPacket extends ProxyPacket
     /** @var string */
     private $message;
 
-    protected function decodePayload(): void
+    public static function create(UUID $uuid, string $message): self
     {
-        $this->uuid = $this->getUUID();
-        $this->message = $this->getString();
+        $result = new self;
+        $result->uuid = $uuid;
+        $result->message = $message;
+        return $result;
     }
 
-    protected function encodePayload(): void
+    public function getUUID(): UUID
     {
-        $this->putUUID($this->uuid);
-        $this->putString($this->message);
+        return $this->uuid;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
+    protected function decodePayload(PacketSerializer $in): void
+    {
+        $this->uuid = $in->getUUID();
+        $this->message = $in->getString();
+    }
+
+    protected function encodePayload(PacketSerializer $out): void
+    {
+        $out->putUUID($this->uuid);
+        $out->putString($this->message);
     }
 
     public function proxyHandle(): void

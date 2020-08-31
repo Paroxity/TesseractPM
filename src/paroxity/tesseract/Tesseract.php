@@ -39,7 +39,7 @@ class Tesseract extends PluginBase
         $server = $config->get("server", []);
 
         $this->proxyAddress = $proxyAddress = $proxy["address"] ?? "127.0.0.1";
-        $this->proxyPort = $proxyAddress = $proxy["port"] ?? 19132;
+        $this->proxyPort = $proxy["port"] ?? 19132;
 
         $pool = PacketPool::getInstance();
         $pool->registerPacket(new ProxyAuthRequestPacket());

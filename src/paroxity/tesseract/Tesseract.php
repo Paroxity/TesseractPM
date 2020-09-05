@@ -12,12 +12,12 @@ use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
-use pocketmine\utils\SingletonTrait;
 use pocketmine\uuid\UUID;
 
 class Tesseract extends PluginBase
 {
-    use SingletonTrait;
+    /** @var self */
+    private static $instance;
 
     /** @var SocketThread */
     private $thread;
@@ -26,6 +26,11 @@ class Tesseract extends PluginBase
     private $proxyAddress;
     /** @var int */
     private $proxyPort;
+
+    protected function onLoad(): void
+    {
+        self::$instance = $this;
+    }
 
     public function onEnable(): void
     {
@@ -58,12 +63,20 @@ class Tesseract extends PluginBase
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
     }
 
-    public function getProxyAddress()
+    /**
+     * @return Tesseract
+     */
+    public static function getInstance(): Tesseract
+    {
+        return self::$instance;
+    }
+
+    public function getProxyAddress(): string
     {
         return $this->proxyAddress;
     }
 
-    public function getProxyPort()
+    public function getProxyPort(): int
     {
         return $this->proxyPort;
     }

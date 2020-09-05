@@ -12,24 +12,20 @@ use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
+use pocketmine\utils\SingletonTrait;
 use pocketmine\uuid\UUID;
 
 class Tesseract extends PluginBase
 {
-    /** @var self */
-    private static $instance;
+    use SingletonTrait;
 
     /** @var SocketThread */
     private $thread;
 
     /** @var string */
     private $proxyAddress;
+    /** @var int */
     private $proxyPort;
-
-    public function onLoad(): void
-    {
-        self::$instance = $this;
-    }
 
     public function onEnable(): void
     {
@@ -39,7 +35,7 @@ class Tesseract extends PluginBase
         $server = $config->get("server", []);
 
         $this->proxyAddress = $proxyAddress = $proxy["address"] ?? "127.0.0.1";
-        $this->proxyPort = $proxyAddress = $proxy["port"] ?? 19132;
+        $this->proxyPort = $proxy["port"] ?? 19132;
 
         $pool = PacketPool::getInstance();
         $pool->registerPacket(new ProxyAuthRequestPacket());
@@ -47,7 +43,7 @@ class Tesseract extends PluginBase
         $pool->registerPacket(new ProxyBlockedChatPacket());
 
         $notifier = new SleeperNotifier();
-        $localAddress = ($socket["host"] ?? "127.0.0.1") === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
+        $localAddress = $this->proxyAddress === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
         $this->thread = $thread = new SocketThread($proxyAddress, (int)($socket["port"] ?? 19131), $socket["secret"] ?? "", $server["name"] ?? "TesseractServer", ($localAddress ? $localAddress : "127.0.0.1") . ":" . $this->getServer()->getPort(), $notifier);
         $this->getServer()->getTickSleeper()->addNotifier($notifier, static function () use ($pool, $thread) {
             while (($buffer = $thread->getBuffer()) !== null) {
@@ -60,11 +56,6 @@ class Tesseract extends PluginBase
         });
 
         $this->getServer()->getPluginManager()->registerEvents(new EventListener($this), $this);
-    }
-
-    public static function getInstance(): Tesseract
-    {
-        return self::$instance;
     }
 
     public function getProxyAddress()

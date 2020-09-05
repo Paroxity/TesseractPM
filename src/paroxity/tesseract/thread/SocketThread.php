@@ -77,11 +77,15 @@ class SocketThread extends Thread
                     $socket = $this->connectToSocketServer();
                 }
                 if ($lengthBuf !== false) {
-                    $length = Binary::readLInt($lengthBuf);
-                    $buffer = socket_read($socket, $length);
-                    if ($buffer !== false) {
-                        $this->receiveBuffer[] = $buffer;
-                        $this->notifier->wakeupSleeper();
+                    try {
+                        $length = Binary::readLInt($lengthBuf);
+                        $buffer = socket_read($socket, $length);
+                        if ($buffer !== false) {
+                            $this->receiveBuffer[] = $buffer;
+                            $this->notifier->wakeupSleeper();
+                        }
+                    } catch (Exception $exception) {
+                        echo "Failed to read from socket: " . ($exception->getMessage()) . PHP_EOL;
                     }
                 }
             } while ($lengthBuf !== false && $lengthBuf !== "");

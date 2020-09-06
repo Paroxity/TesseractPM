@@ -121,10 +121,10 @@ class SocketThread extends Thread
         return $socket;
     }
 
-    public function start($options = PTHREADS_INHERIT_ALL): void
+    public function start($options = PTHREADS_INHERIT_ALL): bool
     {
         $this->isRunning = true;
-        parent::start($options);
+        return parent::start($options);
     }
 
     public function quit(): void

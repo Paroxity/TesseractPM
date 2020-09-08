@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace paroxity\tesseract\thread;
 
 use Exception;
@@ -28,8 +30,11 @@ class SocketThread extends Thread
     /** @var int */
     private $port;
 
+    /** @var string */
     private $secret;
+    /** @var string */
     private $name;
+    /** @var string */
     private $address;
 
     /** @var Threaded */
@@ -116,13 +121,13 @@ class SocketThread extends Thread
         return $socket;
     }
 
-    public function start(int $options = PTHREADS_INHERIT_ALL): void
+    public function start($options = PTHREADS_INHERIT_ALL): bool
     {
         $this->isRunning = true;
-        parent::start($options);
+        return parent::start($options);
     }
 
-    public function quit()
+    public function quit(): void
     {
         $this->isRunning = false;
         parent::quit();

@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace paroxity\tesseract\packet;
 
 use paroxity\tesseract\event\PlayerBlockedChatEvent;
-use paroxity\tesseract\Tesseract;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
+use pocketmine\Server;
 use pocketmine\uuid\UUID;
 
 class ProxyBlockedChatPacket extends ProxyPacket
@@ -48,7 +50,7 @@ class ProxyBlockedChatPacket extends ProxyPacket
 
     public function proxyHandle(): void
     {
-        $player = Tesseract::getInstance()->getPlayerByUUID($this->uuid);
+        $player = Server::getInstance()->getPlayerByUUID($this->uuid);
         if ($player !== null) {
             ($event = new PlayerBlockedChatEvent($player, $this->message))->call();
             if ($event->isCancelled()) {

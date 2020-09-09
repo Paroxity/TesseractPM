@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace paroxity\tesseract\packet;
 
 use pocketmine\network\mcpe\protocol\DataPacket;
@@ -7,7 +9,6 @@ use pocketmine\network\mcpe\protocol\PacketHandlerInterface;
 
 abstract class ProxyPacket extends DataPacket
 {
-
     public function handle(PacketHandlerInterface $handler): bool
     {
         return true;

@@ -56,7 +56,7 @@ class Tesseract extends PluginBase
         PacketPool::registerPacket(new ProxyTransferResponsePacket());
 
         $notifier = new SleeperNotifier();
-        $localAddress = ($socket["host"] ?? "127.0.0.1") === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
+        $localAddress = $this->proxyAddress === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
         $this->thread = $thread = new SocketThread($proxyAddress, (int)($socket["port"] ?? 19131), $socket["secret"] ?? "", $server["name"] ?? "TesseractServer", ($localAddress ? $localAddress : "127.0.0.1") . ":" . $this->getServer()->getPort(), $notifier);
         $this->getServer()->getTickSleeper()->addNotifier($notifier, static function () use ($thread) {
             while (($buffer = $thread->getBuffer()) !== null) {

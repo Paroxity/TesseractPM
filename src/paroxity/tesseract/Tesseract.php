@@ -8,11 +8,15 @@ use paroxity\tesseract\packet\ProxyAuthRequestPacket;
 use paroxity\tesseract\packet\ProxyAuthResponsePacket;
 use paroxity\tesseract\packet\ProxyBlockedChatPacket;
 use paroxity\tesseract\packet\ProxyPacket;
+use paroxity\tesseract\packet\ProxyTransferRequestPacket;
+use paroxity\tesseract\packet\ProxyTransferResponsePacket;
 use paroxity\tesseract\thread\SocketThread;
 use pocketmine\network\mcpe\protocol\PacketPool;
+use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
+use pocketmine\utils\UUID;
 
 class Tesseract extends PluginBase
 {
@@ -26,6 +30,9 @@ class Tesseract extends PluginBase
     private $proxyAddress;
     /** @var int */
     private $proxyPort;
+
+    /** @var array */
+    private $transferRequests;
 
     public function onLoad(): void
     {
@@ -44,7 +51,9 @@ class Tesseract extends PluginBase
 
         PacketPool::registerPacket(new ProxyAuthRequestPacket());
         PacketPool::registerPacket(new ProxyAuthResponsePacket());
-        PacketPool::registerPacket(new ProxyBlockedChatPacket());
+        PacketPool::registerPacket(new ProxyBlockedChatPacket());;
+        PacketPool::registerPacket(new ProxyTransferRequestPacket());
+        PacketPool::registerPacket(new ProxyTransferResponsePacket());
 
         $notifier = new SleeperNotifier();
         $localAddress = ($socket["host"] ?? "127.0.0.1") === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
@@ -75,5 +84,30 @@ class Tesseract extends PluginBase
     public function getProxyPort(): int
     {
         return $this->proxyPort;
+    }
+
+    public function transfer(Player $player, string $target, ?callable $onSuccess = null, ?callable $onFailure = null): void
+    {
+        $pk = new ProxyTransferRequestPacket();
+        $pk->uuid = $player->getUniqueId();
+        $pk->target = $target;
+        $this->thread->addPacketToQueue($pk);
+
+        $this->transferRequests[$player->getUniqueId()->toString()] = [$onSuccess, $onFailure];
+    }
+
+    public function transferResponse(UUID $uuid, bool $success, string $reason): void
+    {
+        if (!isset($this->transferRequests[$uuid->toString()])) {
+            return;
+        }
+
+        [$onSuccess, $onFailure] = $this->transferRequests[$uuid->toString()];
+        if ($success) {
+            if ($onSuccess !== null) ($onSuccess)();
+        } else {
+            if ($onFailure !== null) ($onFailure($reason));
+        }
+        unset($this->transferRequests[$uuid->toString()]);
     }
 }

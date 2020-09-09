@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace paroxity\tesseract;
 
 use paroxity\tesseract\packet\ProxyAuthRequestPacket;
@@ -8,11 +10,9 @@ use paroxity\tesseract\packet\ProxyBlockedChatPacket;
 use paroxity\tesseract\packet\ProxyPacket;
 use paroxity\tesseract\thread\SocketThread;
 use pocketmine\network\mcpe\protocol\PacketPool;
-use pocketmine\player\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
-use pocketmine\uuid\UUID;
 
 class Tesseract extends PluginBase
 {
@@ -79,15 +79,5 @@ class Tesseract extends PluginBase
     public function getProxyPort(): int
     {
         return $this->proxyPort;
-    }
-
-    public function getPlayerByUUID(UUID $uuid): ?Player
-    {
-        foreach ($this->getServer()->getOnlinePlayers() as $player) {
-            if ($player->getUniqueId()->toBinary() === $uuid->toBinary()) {
-                return $player;
-            }
-        }
-        return null;
     }
 }

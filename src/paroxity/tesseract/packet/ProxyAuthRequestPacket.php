@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace paroxity\tesseract\packet;
 
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;

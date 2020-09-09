@@ -90,7 +90,7 @@ class Tesseract extends PluginBase
     {
     	if(($uuid = $player->getUniqueId()) === null){
     		return;
-	    }
+    	}
 
         $pk = new ProxyTransferRequestPacket();
         $pk->uuid = $uuid;

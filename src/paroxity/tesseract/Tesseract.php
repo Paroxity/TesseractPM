@@ -51,7 +51,7 @@ class Tesseract extends PluginBase
 
         PacketPool::registerPacket(new ProxyAuthRequestPacket());
         PacketPool::registerPacket(new ProxyAuthResponsePacket());
-        PacketPool::registerPacket(new ProxyBlockedChatPacket());;
+        PacketPool::registerPacket(new ProxyBlockedChatPacket());
         PacketPool::registerPacket(new ProxyTransferRequestPacket());
         PacketPool::registerPacket(new ProxyTransferResponsePacket());
 
@@ -88,12 +88,16 @@ class Tesseract extends PluginBase
 
     public function transfer(Player $player, string $target, ?callable $onSuccess = null, ?callable $onFailure = null): void
     {
+    	if(($uuid = $player->getUniqueId()) === null){
+    		return;
+	    }
+
         $pk = new ProxyTransferRequestPacket();
-        $pk->uuid = $player->getUniqueId();
+        $pk->uuid = $uuid;
         $pk->target = $target;
         $this->thread->addPacketToQueue($pk);
 
-        $this->transferRequests[$player->getUniqueId()->toString()] = [$onSuccess, $onFailure];
+        $this->transferRequests[$uuid->toString()] = [$onSuccess, $onFailure];
     }
 
     public function transferResponse(UUID $uuid, bool $success, string $reason): void

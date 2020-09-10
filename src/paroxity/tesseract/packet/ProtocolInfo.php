@@ -9,4 +9,6 @@ class ProtocolInfo
     public const PROXY_AUTH_REQUEST_PACKET = 0xC8;
     public const PROXY_AUTH_RESPONSE_PACKET = 0xC9;
     public const PROXY_BLOCKED_CHAT_PACKET = 0xCA;
+    public const PROXY_TRANSFER_REQUEST_PACKET = 0xCB;
+    public const PROXY_TRANSFER_RESPONSE_PACKET = 0xCC;
 }

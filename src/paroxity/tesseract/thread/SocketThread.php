@@ -70,7 +70,7 @@ class SocketThread extends Thread
         $this->start();
     }
 
-    public function onRun(): void
+    public function run(): void
     {
         $socket = $this->connectToSocketServer();
         socket_set_nonblock($socket);

@@ -17,6 +17,24 @@ class ProxyBlockedChatPacket extends ProxyPacket
     /** @var string */
     private $message;
 
+    public static function create(UUID $uuid, string $message): self
+    {
+        $result = new self;
+        $result->uuid = $uuid;
+        $result->message = $message;
+        return $result;
+    }
+
+    public function getUUID(): UUID
+    {
+        return $this->uuid;
+    }
+
+    public function getMessage(): string
+    {
+        return $this->message;
+    }
+
     protected function decodePayload(): void
     {
         $this->uuid = $this->getUUID();

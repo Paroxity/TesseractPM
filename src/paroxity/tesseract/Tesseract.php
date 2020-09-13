@@ -88,10 +88,12 @@ class Tesseract extends PluginBase
 
     public function transfer(Player $player, string $target, ?callable $onSuccess = null, ?callable $onFailure = null): void
     {
-        $pk = ProxyTransferRequestPacket::create($player->getUniqueId(), $target);
+        if (($uuid = $player->getUniqueId()) === null) return;
+
+        $pk = ProxyTransferRequestPacket::create($uuid, $target);
         $this->thread->addPacketToQueue($pk);
 
-        $this->transferRequests[$player->getUniqueId()->toString()] = [$onSuccess, $onFailure];
+        $this->transferRequests[$uuid->toString()] = [$onSuccess, $onFailure];
     }
 
     public function transferResponse(UUID $uuid, bool $success, string $reason): void

@@ -25,6 +25,7 @@ class ProxyTransferResponsePacket extends ProxyPacket
         $result->uuid = $uuid;
         $result->success = $success;
         $result->reason = $reason;
+        return $result;
     }
 
     public function getUUID(): UUID

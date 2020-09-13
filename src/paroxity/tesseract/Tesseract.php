@@ -100,9 +100,7 @@ class Tesseract extends PluginBase
 
     public function transferResponse(UUID $uuid, bool $success, string $reason): void
     {
-        if (!isset($this->transferRequests[$uuid->toString()])) {
-            return;
-        }
+        if (!isset($this->transferRequests[$uuid->toString()])) return;
 
         [$onSuccess, $onFailure] = $this->transferRequests[$uuid->toString()];
         if ($success) {

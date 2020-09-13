@@ -20,7 +20,6 @@ use function socket_set_nonblock;
 use function socket_write;
 use function strlen;
 use function usleep;
-use function var_dump;
 use const AF_INET;
 use const IPPROTO_IP;
 use const MSG_DONTWAIT;
@@ -80,7 +79,7 @@ class SocketThread extends Thread
             while (($send = $this->sendQueue->shift()) !== null) {
                 $length = strlen($send);
                 $wrote = @socket_write($socket, Binary::writeLInt($length) . $send, 4 + $length);
-                if($wrote === 0){
+                if ($wrote === 0) {
                     socket_close($socket);
                     $socket = $this->connectToSocketServer();
                 }
@@ -95,7 +94,7 @@ class SocketThread extends Thread
                         $this->receiveBuffer[] = $buffer;
                         $this->notifier->wakeupSleeper();
                     }
-                } else if($read === 0){
+                } elseif ($read === 0) {
                     socket_close($socket);
                     $socket = $this->connectToSocketServer();
                 }
@@ -118,9 +117,7 @@ class SocketThread extends Thread
 
         do {
             $connected = @socket_connect($socket, $this->host, $this->port);
-            if (!$connected) {
-                sleep(10);
-            }
+            if (!$connected) sleep(10);
         } while (!$connected);
 
         $pk = ProxyAuthRequestPacket::create($this->secret, $this->name, ProxyAuthRequestPacket::CONN_TYPE_SERVER, $this->address);
@@ -147,9 +144,6 @@ class SocketThread extends Thread
         $this->sendQueue[] = $packet->getSerializer()->getBuffer();
     }
 
-    /**
-     * @return string|null
-     */
     public function getBuffer(): ?string
     {
         return $this->receiveBuffer->shift();

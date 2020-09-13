@@ -24,6 +24,7 @@ class ProxyAuthResponsePacket extends ProxyPacket
     {
         $result = new self;
         $result->response = $response;
+        $result->reason = $reason;
         return $result;
     }
 

@@ -98,8 +98,8 @@ class SocketThread extends Thread
                     socket_close($socket);
                     $socket = $this->connectToSocketServer();
                 }
-            } while ($read !== 0);
-            usleep(200);
+            } while ($read !== false);
+            usleep(25000);
         }
 
         socket_close($socket);

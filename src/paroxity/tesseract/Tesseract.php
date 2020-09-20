@@ -31,7 +31,7 @@ class Tesseract extends PluginBase
     /** @var int */
     private $proxyPort;
 
-    /** @var array */
+    /** @var array[] */
     private $transferRequests;
 
     public function onLoad(): void
@@ -88,13 +88,9 @@ class Tesseract extends PluginBase
 
     public function transfer(Player $player, string $target, ?callable $onSuccess = null, ?callable $onFailure = null): void
     {
-    	if(($uuid = $player->getUniqueId()) === null){
-    		return;
-    	}
+        if (($uuid = $player->getUniqueId()) === null) return;
 
-        $pk = new ProxyTransferRequestPacket();
-        $pk->uuid = $uuid;
-        $pk->target = $target;
+        $pk = ProxyTransferRequestPacket::create($uuid, $target);
         $this->thread->addPacketToQueue($pk);
 
         $this->transferRequests[$uuid->toString()] = [$onSuccess, $onFailure];
@@ -102,9 +98,7 @@ class Tesseract extends PluginBase
 
     public function transferResponse(UUID $uuid, bool $success, string $reason): void
     {
-        if (!isset($this->transferRequests[$uuid->toString()])) {
-            return;
-        }
+        if (!isset($this->transferRequests[$uuid->toString()])) return;
 
         [$onSuccess, $onFailure] = $this->transferRequests[$uuid->toString()];
         if ($success) {

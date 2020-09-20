@@ -12,13 +12,43 @@ class ProxyAuthRequestPacket extends ProxyPacket
     public const CONN_TYPE_OTHER = 1;
 
     /** @var string */
-    public $secret;
+    private $secret;
     /** @var string */
-    public $name;
+    private $name;
     /** @var int */
-    public $type;
+    private $type;
     /** @var string */
-    public $address;
+    private $address;
+
+    public static function create(string $secret, string $name, int $type, string $address): self
+    {
+        $result = new self;
+        $result->secret = $secret;
+        $result->name = $name;
+        $result->type = $type;
+        $result->address = $address;
+        return $result;
+    }
+
+    public function getSecret(): string
+    {
+        return $this->secret;
+    }
+
+    public function getServerName(): string
+    {
+        return $this->name;
+    }
+
+    public function getType(): int
+    {
+        return $this->type;
+    }
+
+    public function getAddress(): string
+    {
+        return $this->address;
+    }
 
     protected function decodePayload(): void
     {

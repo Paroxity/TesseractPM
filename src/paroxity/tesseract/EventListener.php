@@ -6,6 +6,7 @@ namespace paroxity\tesseract;
 
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerPreLoginEvent;
+use function preg_match;
 
 class EventListener implements Listener
 {
@@ -20,8 +21,8 @@ class EventListener implements Listener
     public function onPlayerPreLogin(PlayerPreLoginEvent $event): void
     {
         $player = $event->getPlayer();
-        if ($player->getAddress() !== $this->plugin->getProxyAddress()) {
-            $player->transfer($this->plugin->getProxyAddress(), $this->plugin->getProxyPort());
+        if ($player->getAddress() !== $this->plugin->getProxyAddress() && !preg_match("/^(127|172)/", $player->getAddress())) {
+            $event->setKickMessage("You must join via the proxy");
             $event->setCancelled();
         }
     }

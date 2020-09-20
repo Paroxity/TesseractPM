@@ -15,9 +15,27 @@ class ProxyAuthResponsePacket extends ProxyPacket
     public const RESPONSE_FAIL = 1;
 
     /** @var int */
-    public $response;
+    private $response;
     /** @var string */
-    public $reason;
+    private $reason;
+
+    public static function create(int $response, string $reason): self
+    {
+        $result = new self;
+        $result->response = $response;
+        $result->reason = $reason;
+        return $result;
+    }
+
+    public function getResponse(): int
+    {
+        return $this->response;
+    }
+
+    public function getReason(): string
+    {
+        return $this->reason;
+    }
 
     protected function decodePayload(): void
     {

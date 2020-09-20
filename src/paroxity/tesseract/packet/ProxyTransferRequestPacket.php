@@ -11,9 +11,27 @@ class ProxyTransferRequestPacket extends ProxyPacket
     public const NETWORK_ID = ProtocolInfo::PROXY_TRANSFER_REQUEST_PACKET;
 
     /** @var UUID */
-    public $uuid;
+    private $uuid;
     /** @var string */
-    public $target;
+    private $target;
+
+    public static function create(UUID $uuid, string $target): self
+    {
+        $result = new self;
+        $result->uuid = $uuid;
+        $result->target = $target;
+        return $result;
+    }
+
+    public function getUUID(): UUID
+    {
+        return $this->uuid;
+    }
+
+    public function getTarget(): string
+    {
+        return $this->target;
+    }
 
     public function decodePayload(): void
     {

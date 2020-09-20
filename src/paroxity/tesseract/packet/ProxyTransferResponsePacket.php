@@ -12,11 +12,35 @@ class ProxyTransferResponsePacket extends ProxyPacket
     public const NETWORK_ID = ProtocolInfo::PROXY_TRANSFER_RESPONSE_PACKET;
 
     /** @var UUID */
-    public $uuid;
+    private $uuid;
     /** @var bool */
-    public $success;
+    private $success;
     /** @var string */
-    public $reason;
+    private $reason;
+
+    public static function create(UUID $uuid, bool $success, string $reason): self
+    {
+        $result = new self;
+        $result->uuid = $uuid;
+        $result->success = $success;
+        $result->reason = $reason;
+        return $result;
+    }
+
+    public function getUUID(): UUID
+    {
+        return $this->uuid;
+    }
+
+    public function wasSuccessful(): bool
+    {
+        return $this->success;
+    }
+
+    public function getReason(): string
+    {
+        return $this->reason;
+    }
 
     public function decodePayload(): void
     {

@@ -22,8 +22,6 @@ use function strlen;
 use function usleep;
 use const AF_INET;
 use const IPPROTO_IP;
-use const MSG_DONTWAIT;
-use const MSG_WAITALL;
 use const PTHREADS_INHERIT_NONE;
 use const SOCK_STREAM;
 
@@ -72,6 +70,8 @@ class SocketThread extends Thread
 
     public function run(): void
     {
+        $this->registerClassLoader();
+
         $socket = $this->connectToSocketServer();
         socket_set_nonblock($socket);
 
@@ -86,10 +86,10 @@ class SocketThread extends Thread
             }
 
             do {
-                $read = @socket_recv($socket, $lengthBuf, 4, MSG_DONTWAIT);
+                $read = @socket_recv($socket, $lengthBuf, 4, 64);
                 if ($read === 4) {
                     $length = Binary::readLInt($lengthBuf);
-                    $read = @socket_recv($socket, $buffer, $length, MSG_WAITALL);
+                    $read = @socket_recv($socket, $buffer, $length, 256);
                     if ($buffer !== false) {
                         $this->receiveBuffer[] = $buffer;
                         $this->notifier->wakeupSleeper();

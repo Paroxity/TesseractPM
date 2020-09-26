@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace paroxity\tesseract\packet;
 
-use paroxity\tesseract\event\PlayerBlockedChatEvent;
+use paroxity\tesseract\event\player\PlayerBlockedChatEvent;
 use pocketmine\network\mcpe\protocol\serializer\PacketSerializer;
 use pocketmine\Server;
 use pocketmine\uuid\UUID;

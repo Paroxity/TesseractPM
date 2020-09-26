@@ -8,6 +8,8 @@ use paroxity\tesseract\packet\ProxyAuthRequestPacket;
 use paroxity\tesseract\packet\ProxyAuthResponsePacket;
 use paroxity\tesseract\packet\ProxyBlockedChatPacket;
 use paroxity\tesseract\packet\ProxyPacket;
+use paroxity\tesseract\packet\ProxyReceiveMessagePacket;
+use paroxity\tesseract\packet\ProxySendMessagePacket;
 use paroxity\tesseract\packet\ProxyTransferRequestPacket;
 use paroxity\tesseract\packet\ProxyTransferResponsePacket;
 use paroxity\tesseract\thread\SocketThread;
@@ -55,6 +57,8 @@ class Tesseract extends PluginBase
         $pool->registerPacket(new ProxyBlockedChatPacket());
         $pool->registerPacket(new ProxyTransferRequestPacket());
         $pool->registerPacket(new ProxyTransferResponsePacket());
+        $pool->registerPacket(new ProxySendMessagePacket());
+        $pool->registerPacket(new ProxyReceiveMessagePacket());
 
         $notifier = new SleeperNotifier();
         $localAddress = $this->proxyAddress === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
@@ -109,5 +113,16 @@ class Tesseract extends PluginBase
             if ($onFailure !== null) ($onFailure($reason));
         }
         unset($this->transferRequests[$uuid->toString()]);
+    }
+
+    /**
+     * To send a message to all servers, leave $targets as an empty array, otherwise provide all of the names
+     *  of the servers the message should go to.
+     * @param string[] $targets
+     */
+    public function sendMessage(array $targets, string $message): void
+    {
+        $pk = ProxySendMessagePacket::create($targets, $message);
+        $this->thread->addPacketToQueue($pk);
     }
 }

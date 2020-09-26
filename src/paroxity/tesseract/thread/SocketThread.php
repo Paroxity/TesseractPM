@@ -86,10 +86,10 @@ class SocketThread extends Thread
             }
 
             do {
-                $read = @socket_recv($socket, $lengthBuf, 4, MSG_DONTWAIT);
+                $read = @socket_recv($socket, $lengthBuf, 4, 64);
                 if ($read === 4) {
                     $length = Binary::readLInt($lengthBuf);
-                    $read = @socket_recv($socket, $buffer, $length, MSG_WAITALL);
+                    $read = @socket_recv($socket, $buffer, $length, 256);
                     if ($buffer !== false) {
                         $this->receiveBuffer[] = $buffer;
                         $this->notifier->wakeupSleeper();

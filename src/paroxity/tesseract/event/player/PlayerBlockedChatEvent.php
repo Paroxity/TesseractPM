@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace paroxity\tesseract\event;
+namespace paroxity\tesseract\event\player;
 
 use pocketmine\event\Cancellable;
 use pocketmine\event\CancellableTrait;

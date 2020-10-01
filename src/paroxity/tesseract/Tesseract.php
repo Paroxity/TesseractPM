@@ -7,7 +7,10 @@ namespace paroxity\tesseract;
 use paroxity\tesseract\packet\ProxyAuthRequestPacket;
 use paroxity\tesseract\packet\ProxyAuthResponsePacket;
 use paroxity\tesseract\packet\ProxyBlockedChatPacket;
+use paroxity\tesseract\packet\ProxyFindPlayerPacket;
+use paroxity\tesseract\packet\ProxyFindPlayerResponsePacket;
 use paroxity\tesseract\packet\ProxyPacket;
+use paroxity\tesseract\packet\ProxyPlayerInfoPacket;
 use paroxity\tesseract\packet\ProxyReceiveMessagePacket;
 use paroxity\tesseract\packet\ProxySendMessagePacket;
 use paroxity\tesseract\packet\ProxyTransferRequestPacket;
@@ -19,6 +22,8 @@ use pocketmine\plugin\PluginBase;
 use pocketmine\snooze\SleeperNotifier;
 use pocketmine\utils\Internet;
 use pocketmine\uuid\UUID;
+use function strtolower;
+use function var_dump;
 
 class Tesseract extends PluginBase
 {
@@ -34,7 +39,12 @@ class Tesseract extends PluginBase
     private $proxyPort;
 
     /** @var array[] */
-    private $transferRequests;
+    private $transferRequests = [];
+    /** @var callable[] */
+    private $findPlayerRequests = [];
+
+    /** @var array[] */
+    private $playerInfo = [];
 
     protected function onLoad(): void
     {
@@ -59,6 +69,9 @@ class Tesseract extends PluginBase
         $pool->registerPacket(new ProxyTransferResponsePacket());
         $pool->registerPacket(new ProxySendMessagePacket());
         $pool->registerPacket(new ProxyReceiveMessagePacket());
+        $pool->registerPacket(new ProxyFindPlayerPacket());
+        $pool->registerPacket(new ProxyFindPlayerResponsePacket());
+        $pool->registerPacket(new ProxyPlayerInfoPacket());
 
         $notifier = new SleeperNotifier();
         $localAddress = $this->proxyAddress === "127.0.0.1" ? "127.0.0.1" : Internet::getIP();
@@ -124,5 +137,39 @@ class Tesseract extends PluginBase
     {
         $pk = ProxySendMessagePacket::create($targets, $message);
         $this->thread->addPacketToQueue($pk);
+    }
+
+    public function findPlayer(string $player, callable $onResponse): void
+    {
+        $pk = ProxyFindPlayerPacket::create($player);
+        $this->thread->addPacketToQueue($pk);
+
+        $this->findPlayerRequests[strtolower($player)] = $onResponse;
+    }
+
+    public function findPlayerResponse(string $username, bool $online, string $server): void
+    {
+        if (!isset($this->findPlayerRequests[strtolower($username)])) return;
+
+        $this->findPlayerRequests[strtolower($username)]($online, $server);
+        unset($this->findPlayerRequests[strtolower($username)]);
+    }
+
+    public function setPlayerInfo(UUID $uuid, string $address, string $xuid): void
+    {
+        $this->playerInfo[$uuid->toBinary()] = [
+            "address" => $address,
+            "xuid" => $xuid
+        ];
+    }
+
+    public function getPlayerAddress(UUID $uuid): string
+    {
+        return $this->playerInfo[$uuid->toBinary()]["address"] ?? "";
+    }
+
+    public function getPlayerXuid(UUID $uuid): string
+    {
+        return $this->playerInfo[$uuid->toBinary()]["xuid"] ?? "";
     }
 }

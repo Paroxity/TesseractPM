@@ -13,4 +13,7 @@ class ProtocolInfo
     public const PROXY_TRANSFER_RESPONSE_PACKET = 0xcc;
     public const PROXY_SEND_MESSAGE_PACKET = 0xcd;
     public const PROXY_RECEIVE_MESSAGE_PACKET = 0xce;
+    public const PROXY_FIND_PLAYER_PACKET = 0xcf;
+    public const PROXY_FIND_PLAYER_RESPONSE_PACKET = 0xd0;
+    public const PROXY_PLAYER_INFO_PACKET = 0xd1;
 }

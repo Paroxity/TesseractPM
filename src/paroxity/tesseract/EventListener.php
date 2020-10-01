@@ -8,7 +8,6 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use function preg_match;
-use function var_dump;
 
 class EventListener implements Listener
 {
@@ -30,7 +29,5 @@ class EventListener implements Listener
 
     public function onPlayerJoin(PlayerJoinEvent $event): void{
         $player = $event->getPlayer();
-        var_dump($this->plugin->getPlayerAddress($player->getUniqueId()));
-        var_dump($this->plugin->getPlayerXuid($player->getUniqueId()));
     }
 }
